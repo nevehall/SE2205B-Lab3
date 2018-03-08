@@ -17,10 +17,11 @@ public class LinesToDisplay {
      * Constructor for objects of class LinesToDisplay
      */
     public LinesToDisplay() {
-        //ADD CODE FOR THE CONSTRUCTOR
-
-
-
+        lines = (AList<Wordlet>[]) new AList[LINES + 1];
+        for(int i = 0; i < LINES+1; i++) {
+            lines[i] = new AList();
+        }
+        currentLine = 0;
     }
 
     /**
@@ -28,9 +29,7 @@ public class LinesToDisplay {
      *
      */
     public void addWordlet(Wordlet w) {
-        //ADD CODE HERE TO ADD A WORDLET TO THE CURRENT LINE
-
-
+       lines[currentLine].add(w);
     }
 
     /**
@@ -39,8 +38,15 @@ public class LinesToDisplay {
      *
      */
     public void nextLine() {
-        //ADD CODE TO HANDLE THE NEXT LINE
-
+        if(currentLine==LINES) {
+            for(int i = 0;i<LINES;i++) {
+                lines[i] = lines[i+1];
+            }
+            lines[LINES] = new AList();
+        }
+        else {
+            currentLine++;
+        }
     }
 
       

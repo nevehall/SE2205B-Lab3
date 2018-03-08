@@ -1,6 +1,7 @@
 package Dictionary;
 
 import java.io.*;
+import static java.lang.Character.isLetter;
 import java.util.*;
 import javafx.application.Platform;
 
@@ -38,10 +39,8 @@ public class MisspellActionThread implements Runnable {
 
     @Override
     public void run() {
-
-        // ADD CODE HERE TO LOAD DICTIONARY
-
-
+        loadDictionary(dictionaryFileName, myDictionary);
+        
         Platform.runLater(() -> {
             if (dictionaryLoaded) {
                controller.SetMsg("The Dictionary has been loaded"); 
@@ -50,9 +49,15 @@ public class MisspellActionThread implements Runnable {
             }
         });
         
-        // ADD CODE HERE TO CALL checkWords
+        checkWords(textFileName,myDictionary);
         
-
+        /*
+        myLines.addWordlet(new Wordlet("abc", true)); myLines.nextLine();
+        showLines(myLines);
+        myLines.addWordlet(new Wordlet("def", false)); showLines(myLines);
+        myLines.nextLine();
+        */
+        
     }
 
     /**
@@ -70,9 +75,12 @@ public class MisspellActionThread implements Runnable {
 
             input = new Scanner(new File(theFileName));
 
-            // ADD CODE HERE TO READ WORDS INTO THE DICTIONARY     
-
-            
+            while(input.hasNext()) {
+                inString = input.next();
+                theDictionary.add(inString, "");
+            }
+            input.close();
+            dictionaryLoaded = true;
             
         } catch (IOException e) {
             System.out.println("There was an error in reading or opening the file: " + theFileName);
@@ -80,6 +88,7 @@ public class MisspellActionThread implements Runnable {
         }
 
     }
+
 
     /**
      * Get the words to check, check them, then put Wordlets into myLines. When
@@ -93,15 +102,22 @@ public class MisspellActionThread implements Runnable {
             String aWord;
 
             input = new Scanner(new File(theFileName));
-            // ADD CODE HERE    
-
-            
+            while(input.hasNextLine()) {
+                inString = input.nextLine();
+                StringTokenizer st = new StringTokenizer(inString, "\"+=-.),?;:! ", true);
+                while(st.hasMoreTokens()) {
+                    aWord = st.nextToken();
+                    Wordlet wordlet = new Wordlet(aWord,checkWord(aWord,theDictionary));
+                    myLines.addWordlet(wordlet);
+                }
+                showLines(myLines);
+                myLines.nextLine();
+            }
             
         } catch (IOException e) {
             System.out.println("There was an error in reading or opening the file: " + theFileName);
             System.out.println(e.getMessage());
         }
-
     }
 
     /**
@@ -110,14 +126,15 @@ public class MisspellActionThread implements Runnable {
      */
     public boolean checkWord(String word, DictionaryInterface<String, String> theDictionary) {
         boolean result = false;
-
-        // ADD CODE HERE    
-
-        
-        
-
+        for(int i = 0;i<word.length();i++) {
+            if(!isLetter(word.toCharArray()[i])) {
+                return true;
+            }
+        }
+        if(theDictionary.contains(word)) {
+            result = true;
+        }
         return result;
-
     }
 
     private void showLines(LinesToDisplay lines) {
